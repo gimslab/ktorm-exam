@@ -1,21 +1,15 @@
-package com.gimslab.ktormexam.ktormexam
+package com.gimslab.ktormexam
 
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.schema.*
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
-import java.lang.System.*
+import org.springframework.stereotype.Service
 import java.time.LocalDate
+import kotlin.collections.groupBy
 
-@SpringBootApplication
-class KtormExamApplication {
-	constructor() {
-		println("start Ktorm Test")
-		testktorm()
-	}
-
-	private fun testktorm() {
+@Service
+class LocalDbExam {
+	fun testktorm() {
 		Database.connect("jdbc:mysql://localhost:3306/ktormtest", driver = "com.mysql.jdbc.Driver", user = "exam", password = "exam")
 		for (row in Employees.select())
 			println(row[Employees.name])
@@ -31,7 +25,7 @@ class KtormExamApplication {
 		val names2 = Employees
 				.select(Employees.name)
 				.whereWithConditions {
-					if (currentTimeMillis().rem(5) < 4L)
+					if (System.currentTimeMillis().rem(5) < 4L)
 						it += Employees.managerId.isNull()
 				}
 				.map { it.getString(1) }
@@ -40,9 +34,9 @@ class KtormExamApplication {
 		println("---- aggregation")
 		val t = Employees
 		val salaries = t
-				.select(t.departmentId, avg(t.salary))
-				.groupBy(t.departmentId)
-				.having { avg(t.salary) greater 100.0 }
+				.select(Employees.departmentId, avg(Employees.salary))
+				.groupBy(Employees.departmentId)
+				.having { avg(Employees.salary) greater 100.0 }
 				.associate { it.getInt(1) to it.getDouble(2) }
 		println("salaries=$salaries")
 
@@ -69,29 +63,25 @@ class KtormExamApplication {
 
 		println("---- insert")
 		Employees.insert {
-			it.name to "jerry"
-			it.job to "trainee"
-			it.managerId to 1
-			it.hireDate to LocalDate.now()
-			it.salary to 50
-			it.departmentId to 1
+			Employees.name to "jerry"
+			Employees.job to "trainee"
+			Employees.managerId to 1
+			Employees.hireDate to LocalDate.now()
+			Employees.salary to 50
+			Employees.departmentId to 1
 		}
 
 		println("---- update")
 		Employees.update {
-			it.job to "engineer"
-			it.managerId to null
-			it.salary to 100
+			Employees.job to "engineer"
+			Employees.managerId to null
+			Employees.salary to 100
 
 			where {
-				it.id eq 2
+				Employees.id eq 2
 			}
 		}
 	}
-}
-
-fun main(args: Array<String>) {
-	runApplication<KtormExamApplication>(*args)
 }
 
 object Departments : Table<Nothing>("t_department") {

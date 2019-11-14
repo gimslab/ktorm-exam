@@ -36,3 +36,11 @@ tasks.withType<KotlinCompile> {
 		jvmTarget = "1.8"
 	}
 }
+
+tasks.bootRun {
+	if (project.hasProperty("args")) {
+//		args project.args.split(',')
+		args("DDDD")
+	}
+}
+

@@ -1,4 +1,4 @@
-package com.gimslab.ktormexam.ktormexam
+package com.gimslab.ktormexam
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
